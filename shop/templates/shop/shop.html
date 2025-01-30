@@ -70,7 +70,7 @@
 
                     <div class="row">
                         {% for product in products %}
-                        <div class="col-sm-3">
+                        <div class="col-6 col-sm-6 col-md-3">
                             <div class="product-image-wrapper">
                                 <div class="single-products">
                                     <div class="productinfo text-center">
@@ -189,8 +189,6 @@
     .choose ul li a{
         font-size: 10px;
     }
-    
-
 
     .productinfo .add-to-cart:hover, .nav-pills li a:hover {
         background-color:rgb(53, 15, 227); /* Darker sky blue on hover */
@@ -242,6 +240,16 @@
         .productinfo .add-to-cart, .nav-pills li a {
             padding: 4px 12px;
             font-size: 13px;
+        }
+
+        /* Ensure only two products per row on mobile */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .col-6 {
+            flex: 0 0 50%; /* 2 products per row */
         }
     }
 </style>
