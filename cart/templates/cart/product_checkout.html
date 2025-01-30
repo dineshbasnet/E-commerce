@@ -1,0 +1,145 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block title %}Checkout{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'cart/css/cart.css' %}">
+{% endblock extra_css %}
+
+{% block content %}
+<section id="cart_items">
+    <div class="container">
+        <div class="breadcrumbs">
+            <ol class="breadcrumb">
+                <li><a href="{% url 'shop_view' %}">Home</a></li>
+                <li><a href="{% url 'cart_view' %}">Shopping Cart</a></li>
+                <li class="active">Checkout Product</li>
+            </ol>
+        </div>
+        <div class="cart_info">
+            <div class="text-danger" style="padding: 2%;">
+                <section id="do_action">
+                    <div class="container">
+                        <div class="heading">
+                            <p>Please fill, review, and confirm the delivery address.
+                               Also confirm billing.</p>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="chose_area">
+                                    <form action="{% url 'add_delivery_address' %}" method="post">
+                                        {% csrf_token %}
+                                        <ul class="user_info">
+                                            <h3>Add New Delivery Address</h3>
+                                            <input type="hidden" name="cart_product_id" value="{{ product.id }}">
+                                            <li class="single_field">
+                                                <label>State:</label>
+                                                <select name="state-id" id="state">
+                                                    <option value="">Select State</option>
+                                                    {% for state in states %}
+                                                    <option value="{{ state.id }}">{{ state.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </li>
+                                            <li class="single_field">
+                                                <label>District:</label>
+                                                <select name="district-id" id="district">
+                                                    <option value="">Select District</option>
+                                                </select>
+                                            </li>
+                                            <li class="single_field">
+                                                <label>Municipality:</label>
+                                                <select name="municipality-id" id="municipality">
+                                                    <option value="">Select Municipality</option>
+                                                </select>
+                                            </li>
+                                            <li style="margin: 1%;">
+                                                <textarea rows="5" cols="50" name="local-address" id="local-address" placeholder="Descriptive local address"></textarea>
+                                            </li>
+                                        </ul>
+                                        <button type="submit" class="btn btn-default check_out">Save Delivery Address</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% if delivery_addresses %}
+                            <form action="{% url 'place_order' %}" method="post">
+                                {% csrf_token %}
+                                <div class="col-md-5">
+                                    <h3>{{ product.product.name }} | {{ product.product.brand.name }}</h3>
+                                    <hr>
+                                    <div style="margin: 2%;">
+                                        {% for address in delivery_addresses %}
+                                        <label for="{{ address.id }}">
+                                            {{ address.state.name }} | {{ address.district.name }} | {{ address.municipality.name }}<br>
+                                            {{ address.local_address }}
+                                        </label>
+                                        <input type="radio" id="{{ address.id }}" value="{{ address.id }}" name="delivery-address">
+                                        {% endfor %}
+                                    </div>
+                                    <div class="total_area">
+                                        <ul>
+                                            <input type="hidden" name="product-id" value="{{ product.id }}">
+                                            <li>Price per item <span>Rs. {{ product.product.price }} </span></li>
+                                            <li>Quantity <span>{{ product.quantity }}</span></li>
+                                            <li>Total <span>Rs. {{ product.get_total_price }}</span></li>
+                                            <li>
+                                                <select name="payment-method">
+                                                    <option value="cod">Cash on Delivery</option>
+                                                    <option value="khalti">Khalti</option>
+                                                </select>
+                                            </li>
+                                        </ul>
+                                        <button type="submit" class="btn btn-default check_out">Check Out</button>
+                                    </div>
+                                </div>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const stateSelect = document.getElementById("state");
+		const districtSelect = document.getElementById("district");
+		const municipalitySelect = document.getElementById("municipality");
+	
+		stateSelect.addEventListener("change", function () {
+			const stateId = this.value;
+			districtSelect.innerHTML = "<option value=''>Select District</option>";
+			municipalitySelect.innerHTML = "<option value=''>Select Municipality</option>";
+	
+			if (stateId) {
+				fetch(`/cart/get-districts/?state_id=${stateId}`) // Updated path
+					.then(response => response.json())
+					.then(data => {
+						data.forEach(district => {
+							districtSelect.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+						});
+					});
+			}
+		});
+	
+		districtSelect.addEventListener("change", function () {
+			const districtId = this.value;
+			municipalitySelect.innerHTML = "<option value=''>Select Municipality</option>";
+	
+			if (districtId) {
+				fetch(`/cart/get-municipalities/?district_id=${districtId}`) // Updated path
+					.then(response => response.json())
+					.then(data => {
+						data.forEach(municipality => {
+							municipalitySelect.innerHTML += `<option value="${municipality.id}">${municipality.name}</option>`;
+						});
+					});
+			}
+		});
+	});
+	
+</script>
+{% endblock content %}

@@ -2,6 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.password_validation import validate_password
 from .models import CustomUser
 from django.contrib.auth import authenticate, login, logout
+from cart.models import Cart
+
+
+def logout_view(request):
+    logout(request)
+    # print(request.user, "***************************")
+    return redirect('login_view')
 
 
 def login_view(request):
@@ -47,8 +54,18 @@ def register(request):
             # print(type())
             return render(request, 'account/register.html', {'errors':list(e) })
         else:
-            new_user = CustomUser.objects.create_user(email=email, password=password, user_type=user_type)
-
+            try:
+                new_user = CustomUser.objects.create_user(email=email, password=password, user_type=user_type)
+            except Exception as e:
+                return render(request, 'account/register.html', {'error': str(e)})
+            else:
+                if new_user.user_type == 'customer':
+                    try:
+                        Cart.objects.create(user=new_user)
+                    except Exception as e:
+                        new_user.delete()
+                        return render(request, 'account/register.html', {'error': str(e)})
+                    
             if new_user:
                 return redirect('login_view')
         

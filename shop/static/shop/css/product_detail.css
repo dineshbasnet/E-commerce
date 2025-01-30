@@ -1,0 +1,8 @@
+.product-image-wrapper img {
+    width: 100%;  /* Ensures responsiveness */
+    max-width: 400px; /* Adjust width as needed */
+    height: 400px; /* Fixed height */
+    object-fit: cover; /* Ensures the image covers the area properly */
+    display: block;
+    margin: 0 auto;
+}

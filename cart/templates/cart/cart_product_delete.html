@@ -1,0 +1,45 @@
+{% extends 'common/base.html' %}
+
+{% load static %}
+
+{% block title %}
+	Cart Product Delete
+{% endblock title %}
+{% block extra_css %}
+	<link rel="stylesheet" href="{% static 'cart/css/cart.css' %}">
+{% endblock extra_css %}
+
+
+{% block content %}
+<section id="cart_items">
+	<div class="container">
+		<div class="breadcrumbs">
+			<ol class="breadcrumb">
+			  <li><a href="{% url 'shop_view' %}">Home</a></li>
+			  <li >
+				<a href="{% url 'shop_view' %}">Shopping Cart</a>
+				</li>
+			  <li class="active">Delete Product</li>
+			</ol>
+		</div>
+		<div class="cart_info">
+			<div class="text-danger" style="padding: 2%;">
+				<h4>				Are you sure you wanna remove this item from your Cart ?
+				</h4>
+				<h3>{{ product.product.name }} | {{ product.product.brand.name }}</h3>
+				<p> {{ product.product.description }} </p>
+
+				<form action="" method="post" style="margin-bottom: 1%;">
+					{% csrf_token %}
+					<input type="hidden" name="product_id" value="{{product.id}}">
+					<button class="btn btn-danger btn-sm" type="submit">Yes, I am sure.</button>
+				</form>
+				<a class="btn btn-default" href="{% url 'cart_view' %}" >Cancel</a>
+
+			</div>
+
+		</div>
+	</div>
+</section> <!--/#cart_items-->
+
+{% endblock content %}

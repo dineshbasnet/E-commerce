@@ -1,0 +1,249 @@
+{% extends 'common/base.html' %} 
+{% load static %} 
+{% block title %} NeShop | Home {% endblock title %} 
+
+{% block content %} 
+{% include "shop/slider.html" %} 
+
+<section>         
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="left-sidebar">
+                    <h2>Category</h2>
+                    <div class="panel-group category-products" id="accordian">
+                        {% for category_name, data in categories.items %}
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordian" href="#{{category_name}}">
+                                        <span class="badge pull-right"><i class="fa fa-plus"></i></span>
+                                        {{category_name}}
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="{{category_name}}" class="panel-collapse collapse">
+                                <div class="panel-body">
+                                    <ul>
+                                        {% for brand in data.brands %}
+                                        <li><a href="{% url 'category_brand_view' data.category_id brand.id %}">{{brand.name}} </a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div><!--/category-products-->
+                
+                    <div class="brands_products">
+                        <h2>Brands</h2>
+                        <div class="brands-name">
+                            <ul class="nav nav-pills nav-stacked">
+                                {% for brand in brands %}
+                                <li><a href="{% url 'brand_view' brand.id  %}"> <span class="pull-right">({{brand.total_products}})</span>{{brand.name}}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div><!--/brands_products-->
+                    
+                    <div class="price-range">
+                        <h2>Price Range</h2>
+                        <form action="" method="get" style="display: flex; flex-direction:column; justify-content: center">
+                            <div class="well text-center">
+                                <input type="text" class="span2" value="" data-slider-min="{{min_price}}" data-slider-max="{{max_price}}" data-slider-step="5" data-slider-value="[{{min_price}},{{max_price}}]" id="sl2" name="price-range" ><br />
+                                <b class="pull-left">Rs. {{min_price}}</b> <b class="pull-right">Rs. {{max_price}}</b>
+                           </div>
+                           <button class="btn btn-default" type="submit">Filter by Price</button>
+                        </form>
+                    </div><!--/price-range-->
+                    
+                    <div class="shipping text-center">
+                        Show coupons
+                    </div><!--/shipping-->
+                
+                </div>
+            </div>
+            
+            <div class="col-sm-9 padding-right">
+                <div class="features_items">
+                    <h2 class="title text-center">Features Items</h2>
+
+                    <div class="row">
+                        {% for product in products %}
+                        <div class="col-sm-3">
+                            <div class="product-image-wrapper">
+                                <div class="single-products">
+                                    <div class="productinfo text-center">
+                                        {% if product.images.all %}
+                                        <img src="{{ product.images.all.0.image.url }}" alt="{{ product.name }}" class="img-responsive product-image" />
+                                        {% else %}
+                                        <img src="{% static 'shop/images/default_product.webp' %}" alt="{{ product.name }}" class="img-responsive product-image" />
+                                        {% endif %}
+                                        <h2>Rs. {{product.price}}</h2>
+                                        <p>{{ product.name }}</p>
+                                    </div>
+                                    <div class="product-overlay">
+                                        <div class="overlay-content">
+                                            <h2>{{ product.name }}</h2>
+                                            <p>{{ product.description }}</p>
+                                            <a href="{% url 'product_detail_view' product.id %}" class="btn btn-default add-to-cart"><i class="details"></i>Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="choose">
+                                    <ul class="nav nav-pills nav-justified">
+                                        <li><a href="{% url 'add_to_cart_view' product.id %}" class="add-to-cart"><i class="fa fa-shopping-cart"></i> Add to Cart</a></li>
+                                        <li><a href="#"><i class="fa fa-star"></i> Ratings</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </div><!--features_items-->
+                
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if products.has_previous %}
+                            <a href="?page={{ products.previous_page_number }}" class="btn btn-prev-next">Prev</a>
+                        {% endif %}
+                
+                        <span class="current">
+                            Page {{ products.number }} of {{ products.paginator.num_pages }}
+                        </span>
+                
+                        {% if products.has_next %}
+                            <a href="?page={{ products.next_page_number }}"  class="btn btn-prev-next">Next</a>
+                        {% endif %}
+                    </span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Inline CSS -->
+<style>
+    /* Ensure all product cards are the same size */
+    .product-image-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 340px; /* Fixed height */
+        padding: 15px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .product-image-wrapper .product-image {
+        width: 100%;
+        height: 150px; /* Fixed height for product images */
+        object-fit: contain;
+        margin-bottom: 15px;
+    }
+
+    /* Ensure product details (name, price, etc.) align properly */
+    .productinfo p {
+        font-size: 14px;
+        margin-bottom: 10px;
+        font-weight: normal;
+        text-align: center;
+        height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .productinfo h2 {
+        font-size: 16px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .productinfo {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    /* Style for the "Add to Cart" and "Ratings" buttons */
+    .productinfo .add-to-cart, .nav-pills li a {
+        margin-top: 10px;
+        color: white;
+        border-radius: 25px;
+        padding: 5px 15px;
+        font-size: 10px;
+        text-transform: uppercase;
+        text-decoration: none;
+        display: flex;
+        white-space: nowrap;
+        text-align: center;
+        transition: background-color 0.3s ease;
+    }
+    .choose ul li a{
+        font-size: 10px;
+    }
+    
+
+
+    .productinfo .add-to-cart:hover, .nav-pills li a:hover {
+        background-color:rgb(53, 15, 227); /* Darker sky blue on hover */
+    }
+
+    /* Modern Prev/Next button styling */
+    .btn-prev-next {
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        background-color: #00bfff; /* Sky blue */
+        color: white;
+        border-radius: 30px;
+        border: none;
+        margin: 0 10px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-prev-next:hover {
+        background-color:rgb(65, 65, 234); /* Darker blue on hover */
+        transform: scale(1.1);
+    }
+
+    .pagination .current {
+        font-size: 16px;
+        color: #555;
+        margin: 0 15px;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 767px) {
+        .product-image-wrapper {
+            height: 350px;
+        }
+
+        .product-image-wrapper .product-image {
+            height: 120px;
+        }
+
+        .productinfo p {
+            font-size: 12px;
+            height: 35px;
+        }
+
+        .productinfo h2 {
+            font-size: 14px;
+        }
+
+        .productinfo .add-to-cart, .nav-pills li a {
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+    }
+</style>
+
+{% endblock content %}

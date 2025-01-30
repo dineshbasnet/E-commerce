@@ -1,0 +1,71 @@
+{% extends 'common/base.html' %} 
+{% load static %}
+
+{% block title %}
+    Product Detail
+{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'shop/css/product_detail.css' %}">
+    <style>
+      
+    </style>
+{% endblock extra_css %}
+
+
+
+
+{% block content %}
+
+    <div class="container" style="margin-top: 1%;">
+        <div class="row" style="margin-bottom: 1%;">
+            
+            <div class="breadcrumbs">
+                <ol class="breadcrumb">
+                  <li><a href="{% url 'shop_view' %}">Home</a></li>
+                  <li class="active">Product Detail</li>
+                </ol>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="product-image-wrapper">
+                <!-- <img src="{{ product.images.all.0.image.url }}" alt="" /> -->
+                {% if product.images.all %}
+                <img src="{{ product.images.all.0.image.url }}" alt="" />
+                {% else %}
+                <img src="{% static 'shop/images/default_product.webp' %}" alt="" />
+                {% endif %}
+                </div>
+            </div>
+            <div class="col-md-7">
+                
+                <div class="details">
+                    <h2> {{ product.name }} | <small> {{ product.brand.name }} </small>
+                    
+                    <br>
+                    <small> 
+                     {% for category in product.categories.all %}
+                        {{ category.name }}
+                        
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                        
+                     {% endfor %}
+                    
+                    </small>
+                    </h2> 
+                    <hr>
+                    <h4> <b>Price</b>: Rs. {{product.price}} </h4>
+                    <p> {{ product.description }} </p>
+                    <br>
+                    <hr>
+                    <a href="{% url 'add_to_cart_view' product.id %}" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

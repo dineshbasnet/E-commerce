@@ -1,0 +1,12 @@
+.cart_quantity{
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.cart_quantity_up, .cart_quantity_down{
+    cursor: pointer;
+    border: 1px solid #FE980F;
+    padding: 3px 6px;
+    border-radius: 3px;
+}

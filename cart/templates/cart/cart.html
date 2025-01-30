@@ -1,0 +1,157 @@
+{% extends 'common/base.html' %}
+
+{% load static %}
+{% load custom_filters %}
+{% block title %}
+	Cart
+{% endblock title %}
+{% block extra_css %}
+	<link rel="stylesheet" href="{% static 'cart/css/cart.css' %}">
+{% endblock extra_css %}
+
+
+{% block content %}
+<section id="cart_items">
+	<div class="container">
+		<div class="breadcrumbs">
+			<ol class="breadcrumb">
+			  <li><a href="{% url 'shop_view' %}">Home</a></li>
+			  <li class="active">Shopping Cart</li>
+			</ol>
+		</div>
+		<div class="table-responsive cart_info">
+			<table class="table table-condensed">
+				<thead>
+					<tr class="cart_menu">
+						<td class="image">Item</td>
+						<td class="price">Price</td>
+						<td class="quantity">Quantity</td>
+						<td class="total">Total</td>
+						<td class="total">Action</td>
+						<td></td>
+					</tr>
+				</thead>
+				<tbody>
+					{% if products %}
+					{% for cart_product in products %}
+					<tr>
+						<td class="cart_product">
+							<a href="">{{cart_product.product.name}}</a>
+						</td>
+						
+						<td class="cart_price">
+							<p>Rs. {{cart_product.product.price}} </p>
+						</td>
+						<form action="{% url 'checkout' cart_product.id %}" method="post" class="cart-form" data-cart-product-id="{{ cart_product.id }}">
+    {% csrf_token %}
+    <td class="cart_quantity">
+        <div class="cart_quantity_button">
+            <div class="cart_quantity">
+                <div class="cart_quantity_down" onclick="changeQuantity(this, -1)"> - </div>
+                <input class="cart_quantity_input" type="text" name="quantity" value="{{ cart_product.quantity }}" autocomplete="off" size="2">
+                <div class="cart_quantity_up" onclick="changeQuantity(this, 1)"> + </div>
+            </div>
+        </div>
+    </td>
+    <td class="cart_total">
+        <p class="cart_total_price" data-price="{{ cart_product.product.price }}">
+            Rs. <span class="total-price">{{ cart_product.get_total_price }}</span>
+        </p>
+    </td>
+    <td class="cart_delete">
+        <a class="cart_quantity_delete btn-btn-danger" href="{% url 'delete_product_from_cart' cart_product.id %}" style="color:black">Delete</a>
+        <a href="{% url 'checkout' cart_product.id %}" class="btn btn-success" style="background-color: #FE980F; color: white; border: none; padding: 5px 10px; font-size: 14px; border-radius: 4px;">
+            <i class="fa fa-credit-card"></i> Checkout
+        </a>
+    </td>
+</form>
+					</tr>
+					{% endfor %}
+
+					{% else %}
+					<tr>
+						<td>
+							No items in your Cart
+						</td>
+					</tr>
+					{% endif %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</section> <!--/#cart_items-->
+
+{% endblock content %}
+
+
+{% block extra_js %}
+<script>
+	function changeQuantity(element, delta) {
+		const inputField = element.parentElement.querySelector('.cart_quantity_input');
+		let currentQuantity = parseInt(inputField.value, 10);
+		let newQuantity = currentQuantity + delta;
+	
+		if (newQuantity < 1) {
+			newQuantity = 1; // Prevent negative or zero quantity
+		}
+	
+		inputField.value = newQuantity;
+	
+		const priceElement = element.closest('tr').querySelector('.cart_total_price');
+		const unitPrice = parseFloat(priceElement.getAttribute('data-price'));
+		const totalPrice = unitPrice * newQuantity;
+	
+		priceElement.querySelector('.total-price').textContent = totalPrice.toFixed(2); // Format to 2 decimal places
+	
+		// Send AJAX request to update the quantity in the backend
+		const cartProductId = element.closest('form').dataset.cartProductId; // Assuming you set this in the form
+		updateCartQuantity(cartProductId, newQuantity);
+	}
+	
+	function updateCartQuantity(cartProductId, quantity) {
+		fetch(`/update-cart/${cartProductId}/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'X-CSRFToken': getCookie('csrftoken'), // Get CSRF token for security
+			},
+			body: JSON.stringify({ quantity: quantity }),
+		})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log('Success:', data);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+	}
+	
+	// Function to get CSRF token from cookies
+	function getCookie(name) {
+		let cookieValue = null;
+		if (document.cookie && document.cookie !== '') {
+			const cookies = document.cookie.split(';');
+			for (let i = 0; i < cookies.length; i++) {
+				const cookie = cookies[i].trim();
+				// Check if this cookie string begins with the name we want
+				if (cookie.substring(0, name.length + 1) === (name + '=')) {
+					cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+					break;
+				}
+			}
+		}
+		return cookieValue;
+	}
+	
+	function submitForm(inputField) {
+		const form = inputField.closest('form');
+		form.submit();
+	}
+	</script>
+
+{% endblock extra_js %}
