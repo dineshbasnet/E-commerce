@@ -1,0 +1,47 @@
+{% extends 'common/base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Add Product</h2>
+    <div class="row justify-content-center"> <!-- Ensuring the row centers the column -->
+        <div class="col-md-8 col-xs-12"> <!-- Responsive column size: 8 on medium screens, full width on smaller screens -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="productName" class="form-label">Product Name</label>
+                            {{ form.name|add_class:"form-control" }}
+                        </div>
+                        <div class="mb-4">
+                            <label for="productDescription" class="form-label">Product Description</label>
+                            {{ form.description|add_class:"form-control" }}
+                        </div>
+                        <div class="mb-4">
+                            <label for="productPrice" class="form-label">Price</label>
+                            {{ form.price|add_class:"form-control" }}
+                        </div>
+                        <div class="mb-4">
+                            <label for="productCategory" class="form-label">Category</label>
+                            {{ form.categories|add_class:"form-control" }}
+                        </div>
+                        <div class="mb-4">
+                            <label for="productBrand" class="form-label">Brand</label>
+                            {{ form.brand|add_class:"form-control" }}
+                        </div>
+                        <div class="mb-4">
+                            <label for="productImages" class="form-label">Product Images</label>
+                            <input type="file" name="images" id="productImages" class="form-control" multiple>
+                        </div>
+                    
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -12,6 +12,6 @@ urlpatterns = [
     path('get-districts/', get_districts, name='get_districts'),
     path('get-municipalities/', get_municipalities, name='get_municipalities'),
     path('add-delivery-address/', add_delivery_address, name='add_delivery_address'),
-
+   
     
 ]

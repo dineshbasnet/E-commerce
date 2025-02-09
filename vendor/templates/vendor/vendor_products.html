@@ -1,0 +1,79 @@
+{% extends 'common/base.html' %}
+{% block content %}
+
+{% block extra_css %}
+<style>
+.card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Add custom margin to the button container */
+.mb-custom {
+    margin-bottom: 30px;  /* Adjust the bottom margin to your liking */
+}
+</style>
+{% endblock extra_css %}
+
+<div class="container my-5">
+    <!-- Centering the Heading and Button with added margin -->
+    <div class="mb-custom"> <!-- Custom margin class to add space below the button -->
+        <h2>Your Products</h2>
+        <a href="{% url 'add_product' %}" class="btn btn-primary btn-lg mt-3">
+            <i class="bi bi-plus-circle me-2"></i> Add New Product
+        </a>
+    </div>
+    
+    <!-- Product Grid -->
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-2 mb-4">
+                <div class="card shadow-sm border-light rounded-3">
+                    <!-- Display product image -->
+                    <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="{{ product.name }}" style="max-height: 200px; object-fit: cover;">
+
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">Price: ${{ product.price }}</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% url 'edit_product' product.id %}" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="{% url 'delete_product' product.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Product Pagination">
+            <ul class="pagination">
+                {% if products.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if products.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
