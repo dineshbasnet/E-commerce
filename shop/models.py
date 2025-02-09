@@ -31,6 +31,8 @@ class Product(models.Model):
     categories = models.ManyToManyField('shop.Category', related_name="products", blank=True)
     brand = models.ForeignKey('shop.Brand', on_delete=models.SET_NULL, null=True, related_name="products")
     vendor = models.ForeignKey('account.CustomUser', on_delete=models.CASCADE, null=True, blank=True, related_name="products")
+   
+
 
     def __str__(self):
         return self.name
