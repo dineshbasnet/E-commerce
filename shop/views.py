@@ -47,6 +47,7 @@ def shop_view(request):
        
     brand_id = request.session.get('brand_id', None)
     category_id = request.session.get('category_id', None)
+    vendor_id = request.session.get('vendor_id',None)
     
     # if category id and brand id is given filter products by category and brand
     if category_id:
@@ -60,8 +61,17 @@ def shop_view(request):
         brand_id = brand_id
         request.session['brand_id'] = None
         products = products.filter(
-            brand_id=brand_id
+            brand_id=brand_id,
+           
             ).prefetch_related('images').all()
+        
+    if vendor_id:
+        vendor_id = vendor_id
+        request.session['vendor_id']=None
+        products = products.filter(
+            vendor_id=vendor_id
+        ).prefetch_related('images').all
+        
 
 
 
